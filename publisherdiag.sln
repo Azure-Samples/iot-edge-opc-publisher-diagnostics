@@ -5,10 +5,34 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{12AA1D4F-B9A8-4061-A5F9-69A584571099}"
 	ProjectSection(SolutionItems) = preProject
+		docker\linux\amd64\Dockerfile = docker\linux\amd64\Dockerfile
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "publisherdiag", "publisherdiag\publisherdiag.csproj", "{DFD962EA-1C10-4446-A579-1B844C747299}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{83DE459A-F39F-4D0D-BB2F-4F0645C4A603}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linux", "linux", "{52F8AF0E-64D8-4007-9BFD-E9F4472B78FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "amd64", "amd64", "{13BAE047-60B1-4CB1-98FA-4F3208E30D55}"
+	ProjectSection(SolutionItems) = preProject
+		docker\linux\amd64\Dockerfile = docker\linux\amd64\Dockerfile
+		docker\linux\amd64\Dockerfile.debug = docker\linux\amd64\Dockerfile.debug
+		docker\linux\amd64\Dockerfile.ssh = docker\linux\amd64\Dockerfile.ssh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "arm32v7", "arm32v7", "{93C1FF57-967A-4292-8B6E-0F82FA13726E}"
+	ProjectSection(SolutionItems) = preProject
+		docker\linux\arm32v7\Dockerfile = docker\linux\arm32v7\Dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{0D8B0118-4906-4016-896C-A63384EEB1BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "amd64", "amd64", "{957C4AAF-F497-482D-8899-93E92EE65EBC}"
+	ProjectSection(SolutionItems) = preProject
+		docker\windows\amd64\Dockerfile = docker\windows\amd64\Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +47,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{83DE459A-F39F-4D0D-BB2F-4F0645C4A603} = {12AA1D4F-B9A8-4061-A5F9-69A584571099}
+		{52F8AF0E-64D8-4007-9BFD-E9F4472B78FD} = {83DE459A-F39F-4D0D-BB2F-4F0645C4A603}
+		{13BAE047-60B1-4CB1-98FA-4F3208E30D55} = {52F8AF0E-64D8-4007-9BFD-E9F4472B78FD}
+		{93C1FF57-967A-4292-8B6E-0F82FA13726E} = {52F8AF0E-64D8-4007-9BFD-E9F4472B78FD}
+		{0D8B0118-4906-4016-896C-A63384EEB1BC} = {83DE459A-F39F-4D0D-BB2F-4F0645C4A603}
+		{957C4AAF-F497-482D-8899-93E92EE65EBC} = {0D8B0118-4906-4016-896C-A63384EEB1BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F2525F81-1A81-4B9E-9156-D0B90017C494}

@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>publisherdiag</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>OPC Publisher diagnostic</PackageId>
+    <PackageId>OPC Publisher diagnostics</PackageId>
     <Company>Microsoft</Company>
     <Product>OPC Publisher diagnostics</Product>
     <Description>Tool to read OPC Publisher diagnostic information.</Description>
