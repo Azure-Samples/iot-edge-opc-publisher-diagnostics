@@ -17,10 +17,6 @@ namespace PubisherDiag
 
     public class Program
     {
-        ///
-        /// 
-        /// 
-        public static string ProgramName = "PublisherDiag";
         /// <summary>
         /// Logging object.
         /// </summary>
@@ -205,7 +201,7 @@ namespace PubisherDiag
 
             // stop on user request
             Logger.Information("");
-            Logger.Information($"{ProgramName} is running. Press CTRL-C to quit.");
+            Logger.Information("Press CTRL-C to quit.");
 
             // process show log option
             if (ShowLastLogInterval > 0)
@@ -428,7 +424,7 @@ namespace PubisherDiag
             // show usage
             Logger.Information("");
             Logger.Information("");
-            Logger.Information($"Usage: {ProgramName.ToLower()} [<options>]");
+            Logger.Information($"Usage: iot-edge-opc-publisher-diagnostics [<options>]");
             Logger.Information("");
             Logger.Information("If no options are given, diagnostic info is shown with an interval of 30 seconds.");
             Logger.Information("");
@@ -444,32 +440,6 @@ namespace PubisherDiag
                 Logger.Information(line);
             }
         }
-
-        /// <summary>
-        /// Usage message.
-        /// </summary>
-        //private static void Usage(Mono.Options.OptionSet options)
-        //{
-
-        //    // show usage
-        //    Logger.Information("");
-        //    Logger.Information("Usage: {0}.exe [<options>]", Assembly.GetEntryAssembly().GetName().Name);
-        //    Logger.Information("");
-        //    Logger.Information("OPC Publisher node configuration tool.");
-        //    Logger.Information("To exit the application, just press CTRL-C while it is running.");
-        //    Logger.Information("");
-
-        //    // output the options
-        //    Logger.Information("Options:");
-        //    StringBuilder stringBuilder = new StringBuilder();
-        //    StringWriter stringWriter = new StringWriter(stringBuilder);
-        //    options.WriteOptionDescriptions(stringWriter);
-        //    string[] helpLines = stringBuilder.ToString().Split("\n");
-        //    foreach (var line in helpLines)
-        //    {
-        //        Logger.Information(line);
-        //    }
-        //}
 
         private static string _logLevel = "info";
         private static Publisher _publisher = null;

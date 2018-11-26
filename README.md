@@ -18,7 +18,7 @@ The application is/can:
 ### Prerequisites
 
 The application requires .NET Core to be built and OPC Publisher deployed either standalone or as IoT Edge module at runtime.
-The diagnostics functionality only works with OPC Publisher versions hgher than 2.2.0.
+The diagnostics functionality only works with OPC Publisher versions higher than 2.2.0.
 
 
 ### Installation
