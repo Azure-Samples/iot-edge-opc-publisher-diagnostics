@@ -1,57 +1,67 @@
-# Project Name
+# iot-edge-opc-publisher-diagnostics
 
-(short, 1-3 sentenced, description of the project)
+This .NET Core application allows to read diagnostic info from [OPC Publisher](https://github.com/Azure/iot-edge-opc-publisher) using IoTHub direct method calls.
+
 
 ## Features
 
-This project framework provides the following features:
+The application is/can:
+* Show diagnostic information with a recurring interval
+* Show the startup log of OPC Publisher
+* Show the tail of the log of OPC Publisher
+* Trigger the OPC Publisher to exit
 
-* Feature 1
-* Feature 2
-* ...
 
 ## Getting Started
 
+
 ### Prerequisites
 
-(ideally very short, if any)
+The application requires .NET Core to be built and OPC Publisher deployed either standalone or as IoT Edge module at runtime.
+The diagnostics functionality only works with OPC Publisher versions hgher than 2.2.0.
 
-- OS
-- Library version
-- ...
 
 ### Installation
 
-(ideally very short)
+You need to compile the solution with Visual Studio and then run it.
 
-- npm install [package name]
-- mvn install
-- ...
 
 ### Quickstart
-(Add steps to get up and running quickly)
 
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
+The application supports several command line options to control its functionality. 
 
+Here the usage output:
+        OPC Publisher diagnostic tool
+        Log level is: info
 
-## Demo
+        Usage: publisherdiag [<options>]
 
-A demo app is included to show how to use the project.
+        If no options are given, diagnostic info is shown with an interval of 30 seconds.
 
-To run the demo, follow these steps:
+        Options:
+          -h, --help                 show this message and exit
+              --ic, --iotHubConnectionString=VALUE
+                                     IoTHub owner or service connectionstring
+              --id, --iothubdevicename=VALUE
+                                     IoTHub device name of the OPC Publisher
+              --im, --iothubmodulename=VALUE
+                                     IoT Edge module name of the OPC Publisher which
+                                       runs in the IoT Edge device specified by id/
+                                       iothubdevicename
+              --di, --diagnosticsinterval=VALUE
+                                     shows publisher diagnostic info at the specified
+                                       interval in seconds
+                                       Default: 0
+              --sl, --showlastlog=VALUE
+                                     shows last lines of OPC Publisher log output at
+                                       the specified interval in seconds
+                                       Default: 0
+              --ss, --showstartuplog shows startup log of OPC Publisher log output
+                                       Default: False
+              --ea, --exitapplication=VALUE
+                                     sends an exit command to OPC Publisher to exit in
+                                       given number of seconds (ignores all other
+                                       options)
 
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+If no options are specified, the diagnostic information is shown each 30 seconds. The options `exitapplication` and `showstartuplog` exit the application
+after completed.
