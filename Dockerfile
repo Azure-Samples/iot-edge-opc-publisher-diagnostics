@@ -5,19 +5,19 @@ FROM microsoft/dotnet:${build_base_tag} AS build
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
-COPY opcpublisher/*.csproj ./opcpublisher/
-WORKDIR /app/opcpublisher
+COPY publisherdiag/*.csproj ./publisherdiag/
+WORKDIR /app/publisherdiag
 RUN dotnet restore
 
 # copy and publish app
 WORKDIR /app
-COPY opcpublisher/. ./opcpublisher/
-WORKDIR /app/opcpublisher
+COPY publisherdiag/. ./publisherdiag/
+WORKDIR /app/publisherdiag
 RUN dotnet publish -c Release -o out
 
 # start it up
 FROM microsoft/dotnet:${runtime_base_tag} AS runtime
 WORKDIR /app
-COPY --from=build /app/opcpublisher/out ./
+COPY --from=build /app/publisherdiag/out ./
 WORKDIR /appdata
-ENTRYPOINT ["dotnet", "/app/opcpublisher.dll"]
+ENTRYPOINT ["dotnet", "/app/publisherdiag.dll"]

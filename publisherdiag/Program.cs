@@ -11,12 +11,18 @@ using System.Threading.Tasks;
 namespace PubisherDiag
 {
     using OpcPublisher;
+    using System.Diagnostics;
     using System.Net;
     using System.Reflection;
     using static System.Console;
 
-    public class Program
+    public sealed class Program
     {
+        /// <summary>
+        /// name of the application
+        /// </summary>
+        public const string ProgramName = "PublisherDiag";
+
         /// <summary>
         /// Logging object.
         /// </summary>
@@ -131,6 +137,9 @@ namespace PubisherDiag
                 Usage(options, args);
                 return;
             }
+            //show version
+            Logger.Information($"{ProgramName} V{FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion} starting up...");
+            Logger.Debug($"Informational version: V{(Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute).InformationalVersion}");
 
             // sanity check parameters
             if (string.IsNullOrEmpty(iotHubConnectionString) || string.IsNullOrEmpty(iotHubPublisherDeviceName))
@@ -158,7 +167,7 @@ namespace PubisherDiag
             _publisher = new Publisher(iotHubConnectionString, iotHubPublisherDeviceName, iotHubPublisherModuleName, ct);
 
             // validate OPC Publisher version
-            if (!await ValidatePublisherVersionAsync(ct))
+            if (!await ValidatePublisherVersionAsync(ct).ConfigureAwait(false))
             {
                 Environment.Exit(1);
             }
@@ -180,7 +189,7 @@ namespace PubisherDiag
             // show startup log if requested and we are done
             if (ShowStartupLogSwitch)
             {
-                await ShowStartupLogAsync(ct);
+                await ShowStartupLogAsync(ct).ConfigureAwait(false);
                 Environment.Exit(0);
             }
 
@@ -208,14 +217,14 @@ namespace PubisherDiag
             {
                 Logger.Information("");
                 Logger.Information($"Show log interval set to {ShowLastLogInterval} seconds");
-                await Task.Run(() => ShowLogAsync(ct));
+                await Task.Run(() => ShowLogAsync(ct)).ConfigureAwait(false);
             }
 
             if (DiagnosticInterval > 0)
             {
                 Logger.Information("");
                 Logger.Information($"Diagnostic interval is {DiagnosticInterval} seconds");
-                await Task.Run(() => ShowDiagnosticInfoAsync(ct));
+                await Task.Run(() => ShowDiagnosticInfoAsync(ct)).ConfigureAwait(false);
             }
 
             quitEvent.WaitOne(Timeout.Infinite);
@@ -234,7 +243,7 @@ namespace PubisherDiag
         private static async Task<bool> ValidatePublisherVersionAsync(CancellationToken ct)
         {
             // fetch the information
-            GetInfoMethodResponseModel info = await _publisher.GetInfoAsync(ct);
+            GetInfoMethodResponseModel info = await _publisher.GetInfoAsync(ct).ConfigureAwait(false);
             if (info == null)
             {
                 return false;
@@ -253,7 +262,7 @@ namespace PubisherDiag
             do
             {
                 // fetch the diagnostic data
-                DiagnosticInfoMethodResponseModel diagnosticInfo = await _publisher.GetDiagnosticInfoAsync(ct);
+                DiagnosticInfoMethodResponseModel diagnosticInfo = await _publisher.GetDiagnosticInfoAsync(ct).ConfigureAwait(false);
 
                 // display the diagnostic data
                 if (diagnosticInfo != null)
@@ -289,7 +298,7 @@ namespace PubisherDiag
                 }
 
                 // wait for next interval
-                await Task.Delay((int)DiagnosticInterval * 1000, ct);
+                await Task.Delay((int)DiagnosticInterval * 1000, ct).ConfigureAwait(false);
 
             } while (!ct.IsCancellationRequested);
         }
@@ -301,7 +310,7 @@ namespace PubisherDiag
         private static async Task ShowStartupLogAsync(CancellationToken ct)
         {
             // fetch the log
-            DiagnosticLogMethodResponseModel diagnosticLog = await _publisher.GetDiagnosticLogAsync(ct);
+            DiagnosticLogMethodResponseModel diagnosticLog = await _publisher.GetDiagnosticLogAsync(ct).ConfigureAwait(false);
 
             // process log request
             Logger.Information("");
@@ -332,7 +341,7 @@ namespace PubisherDiag
             do
             {
                 // fetch the log
-                DiagnosticLogMethodResponseModel diagnosticLog = await _publisher.GetDiagnosticLogAsync(ct);
+                DiagnosticLogMethodResponseModel diagnosticLog = await _publisher.GetDiagnosticLogAsync(ct).ConfigureAwait(false);
 
                 // process log request
                 if (first)
@@ -361,7 +370,7 @@ namespace PubisherDiag
                 Logger.Information("");
 
                 // wait for next interval
-                await Task.Delay((int)ShowLastLogInterval * 1000, ct);
+                await Task.Delay((int)ShowLastLogInterval * 1000, ct).ConfigureAwait(false);
 
             } while (!ct.IsCancellationRequested);
         }
@@ -406,7 +415,7 @@ namespace PubisherDiag
         /// <summary>
         /// Usage message.
         /// </summary>
-        private static void Usage(Mono.Options.OptionSet options, string[] args)
+        private static void Usage(Mono.Options.OptionSet options, string[] args = null)
         {
             Logger.Information("");
 
@@ -423,8 +432,10 @@ namespace PubisherDiag
 
             // show usage
             Logger.Information("");
+            Logger.Information($"{ProgramName} V{FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
+            Logger.Information($"Informational version: V{(Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute).InformationalVersion}");
             Logger.Information("");
-            Logger.Information($"Usage: iot-edge-opc-publisher-diagnostics [<options>]");
+            Logger.Information("Usage: {0} [<options>]", Assembly.GetEntryAssembly().GetName().Name);
             Logger.Information("");
             Logger.Information("If no options are given, diagnostic info is shown with an interval of 30 seconds.");
             Logger.Information("");
@@ -434,7 +445,7 @@ namespace PubisherDiag
             StringBuilder stringBuilder = new StringBuilder();
             StringWriter stringWriter = new StringWriter(stringBuilder);
             options.WriteOptionDescriptions(stringWriter);
-            string[] helpLines = stringBuilder.ToString().Split("\r\n");
+            string[] helpLines = stringBuilder.ToString().Split("\n");
             foreach (var line in helpLines)
             {
                 Logger.Information(line);
