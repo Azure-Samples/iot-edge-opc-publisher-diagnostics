@@ -32,6 +32,7 @@ namespace PubisherDiag
             TimeSpan connectionTimeout = TimeSpan.FromSeconds(120);
             _getDiagnosticInfoMethod = new CloudToDeviceMethod("GetDiagnosticInfo", responseTimeout, connectionTimeout);
             _getDiagnosticLogMethod = new CloudToDeviceMethod("GetDiagnosticLog", responseTimeout, connectionTimeout);
+            _getDiagnosticStartupLogMethod = new CloudToDeviceMethod("GetDiagnosticStartupLog", responseTimeout, connectionTimeout);
             _exitApplicationMethod = new CloudToDeviceMethod("ExitApplication", responseTimeout, connectionTimeout);
             _getInfoMethod = new CloudToDeviceMethod("GetInfo", responseTimeout, connectionTimeout);
         }
@@ -48,11 +49,11 @@ namespace PubisherDiag
                 CloudToDeviceMethodResult methodResult = new CloudToDeviceMethodResult();
                 if (string.IsNullOrEmpty(_publisherModuleName))
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _getDiagnosticInfoMethod, ct);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _getDiagnosticInfoMethod, ct).ConfigureAwait(false);
                 }
                 else
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _getDiagnosticInfoMethod, ct);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _getDiagnosticInfoMethod, ct).ConfigureAwait(false);
                 }
                 if (methodResult.Status == (int)HttpStatusCode.OK)
                 {
@@ -67,7 +68,7 @@ namespace PubisherDiag
             {
                 if (!ct.IsCancellationRequested)
                 {
-                    Logger.Fatal(e, $"GetDiagnosticInfo exception");
+                    Logger.Error(e, $"Exception");
                 }
             }
             return response;
@@ -85,11 +86,11 @@ namespace PubisherDiag
                 CloudToDeviceMethodResult methodResult = new CloudToDeviceMethodResult();
                 if (string.IsNullOrEmpty(_publisherModuleName))
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _getDiagnosticLogMethod, ct);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _getDiagnosticLogMethod, ct).ConfigureAwait(false);
                 }
                 else
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _getDiagnosticLogMethod, ct);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _getDiagnosticLogMethod, ct).ConfigureAwait(false);
                 }
                 if (methodResult.Status == (int)HttpStatusCode.OK)
                 {
@@ -104,7 +105,44 @@ namespace PubisherDiag
             {
                 if (!ct.IsCancellationRequested)
                 {
-                    Logger.Fatal(e, $"GetDiagnosticLog exception");
+                    Logger.Error(e, $"Exception");
+                }
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// Call the GetDiagnosticStartupLog method.
+        /// </summary>
+        public async Task<DiagnosticLogMethodResponseModel> GetDiagnosticStartupLogAsync(CancellationToken ct)
+        {
+            DiagnosticLogMethodResponseModel response = null;
+
+            try
+            {
+                CloudToDeviceMethodResult methodResult = new CloudToDeviceMethodResult();
+                if (string.IsNullOrEmpty(_publisherModuleName))
+                {
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _getDiagnosticStartupLogMethod, ct).ConfigureAwait(false);
+                }
+                else
+                {
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _getDiagnosticStartupLogMethod, ct).ConfigureAwait(false);
+                }
+                if (methodResult.Status == (int)HttpStatusCode.OK)
+                {
+                    response = JsonConvert.DeserializeObject<DiagnosticLogMethodResponseModel>(methodResult.GetPayloadAsJson());
+                }
+                else
+                {
+                    Logger.Error($"GetDiagnosticStartupLog failed with status {methodResult.Status}");
+                }
+            }
+            catch (Exception e)
+            {
+                if (!ct.IsCancellationRequested)
+                {
+                    Logger.Error(e, $"Exception");
                 }
             }
             return response;
@@ -127,11 +165,11 @@ namespace PubisherDiag
                 CloudToDeviceMethodResult methodResult = new CloudToDeviceMethodResult();
                 if (string.IsNullOrEmpty(_publisherModuleName))
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _exitApplicationMethod);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _exitApplicationMethod).ConfigureAwait(false);
                 }
                 else
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _exitApplicationMethod);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _exitApplicationMethod).ConfigureAwait(false);
                 }
                 if (methodResult.Status == (int)HttpStatusCode.OK)
                 {
@@ -145,7 +183,7 @@ namespace PubisherDiag
             }
             catch (Exception e)
             {
-                Logger.Fatal(e, $"ExitApplication exception");
+                Logger.Error(e, $"Exception");
             }
             return result;
         }
@@ -162,11 +200,11 @@ namespace PubisherDiag
                 CloudToDeviceMethodResult methodResult = new CloudToDeviceMethodResult();
                 if (string.IsNullOrEmpty(_publisherModuleName))
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _getInfoMethod, ct);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _getInfoMethod, ct).ConfigureAwait(false);
                 }
                 else
                 {
-                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _getInfoMethod, ct);
+                    methodResult = await _iotHubClient.InvokeDeviceMethodAsync(_publisherDeviceName, _publisherModuleName, _getInfoMethod, ct).ConfigureAwait(false);
                 }
                 if (methodResult.Status == (int)HttpStatusCode.OK)
                 {
@@ -202,6 +240,7 @@ namespace PubisherDiag
         Module _publisherModule;
         CloudToDeviceMethod _getDiagnosticInfoMethod;
         CloudToDeviceMethod _getDiagnosticLogMethod;
+        CloudToDeviceMethod _getDiagnosticStartupLogMethod;
         CloudToDeviceMethod _exitApplicationMethod;
         CloudToDeviceMethod _getInfoMethod;
     }

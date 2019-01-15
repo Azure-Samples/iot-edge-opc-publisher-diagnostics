@@ -12,7 +12,6 @@ namespace PubisherDiag
 {
     using OpcPublisher;
     using System.Diagnostics;
-    using System.Net;
     using System.Reflection;
     using static System.Console;
 
@@ -26,7 +25,7 @@ namespace PubisherDiag
         /// <summary>
         /// Logging object.
         /// </summary>
-        public static Serilog.Core.Logger Logger = null;
+        public static Serilog.Core.Logger Logger { get; set; } = null;
 
         /// <summary>
         /// Interval in sec to show the diagnostic info.
@@ -212,26 +211,33 @@ namespace PubisherDiag
             Logger.Information("");
             Logger.Information("Press CTRL-C to quit.");
 
-            // process show log option
-            if (ShowLastLogInterval > 0)
+            try
             {
-                Logger.Information("");
-                Logger.Information($"Show log interval set to {ShowLastLogInterval} seconds");
-                await Task.Run(() => ShowLogAsync(ct)).ConfigureAwait(false);
-            }
+                // process show log option
+                if (ShowLastLogInterval > 0)
+                {
+                    Logger.Information("");
+                    Logger.Information($"Show log interval set to {ShowLastLogInterval} seconds");
+                    await Task.Run(() => ShowLogAsync(ct)).ConfigureAwait(false);
+                }
 
-            if (DiagnosticInterval > 0)
+                if (DiagnosticInterval > 0)
+                {
+                    Logger.Information("");
+                    Logger.Information($"Diagnostic interval is {DiagnosticInterval} seconds");
+                    await Task.Run(() => ShowDiagnosticInfoAsync(ct)).ConfigureAwait(false);
+                }
+
+                quitEvent.WaitOne(Timeout.Infinite);
+
+                Logger.Information("");
+                Logger.Information("");
+                cts.Cancel();
+            }
+            catch (Exception e)
             {
-                Logger.Information("");
-                Logger.Information($"Diagnostic interval is {DiagnosticInterval} seconds");
-                await Task.Run(() => ShowDiagnosticInfoAsync(ct)).ConfigureAwait(false);
+                Logger.Fatal(e, "Exception");
             }
-
-            quitEvent.WaitOne(Timeout.Infinite);
-
-            Logger.Information("");
-            Logger.Information("");
-            cts.Cancel();
             Logger.Information($"Done. Exiting....");
             return;
         }
@@ -250,6 +256,8 @@ namespace PubisherDiag
             }
 
             Logger.Information($"OPC Publisher V{info.VersionMajor}.{info.VersionMinor}.{info.VersionPatch} was detected.");
+            Logger.Debug($"semantic version: {info.SemanticVersion}");
+            Logger.Debug($"informational version: {info.InformationalVersion}");
             return true;
         }
 
@@ -270,10 +278,9 @@ namespace PubisherDiag
                     Logger.Information("==========================================================================");
                     Logger.Information($"OpcPublisher started @ {diagnosticInfo.PublisherStartTime})");
                     Logger.Information("---------------------------------");
-                    Logger.Information($"OPC sessions: {diagnosticInfo.NumberOfOpcSessions}");
-                    Logger.Information($"connected OPC sessions: {diagnosticInfo.NumberOfConnectedOpcSessions}");
-                    Logger.Information($"connected OPC subscriptions: {diagnosticInfo.NumberOfConnectedOpcSubscriptions}");
-                    Logger.Information($"OPC monitored items: {diagnosticInfo.NumberOfMonitoredItems}");
+                    Logger.Information($"OPC sessions (configured/connected): {diagnosticInfo.NumberOfOpcSessionsConfigured}/{diagnosticInfo.NumberOfOpcSessionsConnected}");
+                    Logger.Information($"OPC subscriptions (configured/connected): {diagnosticInfo.NumberOfOpcSubscriptionsConfigured}/{diagnosticInfo.NumberOfOpcSubscriptionsConnected}");
+                    Logger.Information($"OPC monitored items (configured/monitored/to remove): {diagnosticInfo.NumberOfOpcMonitoredItemsConfigured}/{diagnosticInfo.NumberOfOpcMonitoredItemsMonitored}/{diagnosticInfo.NumberOfOpcMonitoredItemsToRemove}");
                     Logger.Information("---------------------------------");
                     Logger.Information($"monitored items queue bounded capacity: {diagnosticInfo.MonitoredItemsQueueCapacity}");
                     Logger.Information($"monitored items queue current items: {diagnosticInfo.MonitoredItemsQueueCount}");
@@ -306,19 +313,18 @@ namespace PubisherDiag
         /// <summary>
         /// Task to fetch and display startup log.
         /// </summary>
-        /// <returns></returns>
         private static async Task ShowStartupLogAsync(CancellationToken ct)
         {
             // fetch the log
-            DiagnosticLogMethodResponseModel diagnosticLog = await _publisher.GetDiagnosticLogAsync(ct).ConfigureAwait(false);
+            DiagnosticLogMethodResponseModel diagnosticLog = await _publisher.GetDiagnosticStartupLogAsync(ct).ConfigureAwait(false);
 
             // process log request
             Logger.Information("");
-            Logger.Information($"Messages fetched from startup log buffer: {diagnosticLog.StartupLogMessageCount}");
+            Logger.Information($"Messages fetched from startup log buffer: {diagnosticLog.LogMessageCount}");
             Logger.Information($"Startup log from OPC Publisher ===========================================");
-            if (diagnosticLog.StartupLog != null)
+            if (diagnosticLog != null && diagnosticLog.Log != null)
             {
-                foreach (var line in diagnosticLog.StartupLog)
+                foreach (var line in diagnosticLog.Log)
                 {
                     WriteLine($">>>> {line}");
                 }
@@ -347,15 +353,15 @@ namespace PubisherDiag
                 if (first)
                 {
                     Logger.Information("");
-                    Logger.Information($"Messages missed since last time: {diagnosticLog.MissedMessageCount}");
                     Logger.Information($"Max message capacity of log buffer: {diagnosticLog.LogMessageCount}");
                     first = false;
                 }
 
-                if (diagnosticLog.Log != null)
+                if (diagnosticLog != null && diagnosticLog.Log != null)
                 {
                     Logger.Information("");
-                    Logger.Information($"Messages fetched from log buffer: {diagnosticLog.Log.Length}");
+                    Logger.Information($"Messages fetched from log buffer: {diagnosticLog.Log.Count}");
+                    Logger.Information($"Messages missed since last time: {diagnosticLog.MissedMessageCount}");
                     Logger.Information($"Log from OPC Publisher ===================================================");
                     foreach (var line in diagnosticLog.Log)
                     {
