@@ -1,6 +1,6 @@
 ---
 page_type: sample
-description: "IoT OPC publisher diagnostics."
+description: "Industrial IoT OPC publisher diagnostics."
 languages:
 - csharp
 products:
