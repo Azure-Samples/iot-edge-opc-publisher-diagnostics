@@ -9,7 +9,7 @@ products:
 urlFragment: azure-iot-opc-publisher-dignostics
 ---
 
-# iot-edge-opc-publisher-diagnostics
+# OPC Publisher Diagnostics - IoT Edge
 
 This .NET Core application allows to read diagnostic info from [OPC Publisher](https://github.com/Azure/iot-edge-opc-publisher) using IoTHub direct method calls.
 
