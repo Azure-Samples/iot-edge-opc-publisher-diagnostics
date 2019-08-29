@@ -1,6 +1,6 @@
 ---
 page_type: sample
-description: "Industrial IoT OPC publisher diagnostics."
+description: "Industrial IoT - OPC Publisher diagnostics."
 languages:
 - csharp
 products:
@@ -9,7 +9,7 @@ products:
 urlFragment: azure-iot-opc-publisher-dignostics
 ---
 
-# OPC Publisher Diagnostics - IoT Edge
+# OPC Publisher diagnostics
 
 This .NET Core application allows to read diagnostic info from [OPC Publisher](https://github.com/Azure/iot-edge-opc-publisher) using IoTHub direct method calls.
 
